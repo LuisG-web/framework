@@ -1,18 +1,30 @@
 <?php
 class Rota{
     private $controlador = "Paginas";
+    private $metodo = 'index';
+    private $parametros = [];
     public function __construct(){
         //echo 'criando a primeira classe ';
-        $this->url();
-        if(file_exists('../app/Controllers/'.ucwords($url[@]).'.php')) {
-        $this->controlador = ucwords($url[0]); unset($url[0]);
-      } require_once '../app/Controllers/'.$this->controlador.'.php'; $this->controlador = new $this->controlador;
+        $url = $this->url() ? $this->url(): [0];
+        if(file_exists('..app/Controllers/'.ucwords($url[0].'.php'))){
+            $this->controlador = ucwords($url[0]);
+            unset($url[0]);
+        }//fim do if que verifica se o arquivo existe
+        require_once '../app/Controllers/'.$this->controlador.'.php';
+        $this->controlador = new $this->controlador;
+        if(isset($url[1])){
+            if(method_exists($this->controlador, $url[1])){
+                $this->metodo = $url[1];
+                unset($url[1]);
+            }//fim do if que verifica se o método existe
+        }//fim do if que verifica se a url existe
 
-var_dump($this);
-
-}
-        //verificar se a url existe
-    }//fim da função construtor
+        $this->parametros = $url ? array_values($url) : [];
+        call_user_func_array([$this->controlador, $this->metodo], $this->parametros);
+        
+        var_dump($this);
+        
+ } //fim da função construtor
 
     private function url(){
         //echo 'carregando a url';
@@ -29,5 +41,4 @@ var_dump($this);
             return $url;
         }//fim do if
     }//fim da function url
-
 }//fim da classe Rota
